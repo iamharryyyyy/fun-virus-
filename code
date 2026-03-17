@@ -1,0 +1,52 @@
+(function(){
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function startSiren() {
+        const masterGain = audioCtx.createGain();
+        masterGain.gain.value = 0.15;
+        masterGain.connect(audioCtx.destination);
+
+        const carrier = audioCtx.createOscillator();
+        carrier.type = 'sine';
+        carrier.frequency.value = 400;
+
+        const lfo = audioCtx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.value = 0.6;
+
+        const lfoGain = audioCtx.createGain();
+        lfoGain.gain.value = 200;
+
+        lfo.connect(lfoGain);
+        lfoGain.connect(carrier.frequency);
+        carrier.connect(masterGain);
+
+        carrier.start();
+        lfo.start();
+
+        return {
+            stop: () => {
+                try {
+                    masterGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
+                    carrier.stop(audioCtx.currentTime + 0.5);
+                    lfo.stop(audioCtx.currentTime + 0.5);
+                } catch (e) {}
+            }
+        };
+    }
+
+    const siren = startSiren();
+
+    for (let i = 0; i < 1000; i++) {
+        const input = prompt("YOU'RE BEING HACKED!\nEnter the correct code to stop:");
+        if (input === '3483') {
+            siren.stop();
+            alert("You've entered the right code. The hack has been stopped");
+            break;
+        } else {
+            alert("INCORRECT. Try Again");
+        }
+    }
+
+    try { siren.stop(); } catch (e) {}
+})();
