@@ -39,7 +39,7 @@
 
     for (let i = 0; i < 1000; i++) {
         const input = prompt("YOU'RE BEING HACKED!\nEnter the correct code to stop:");
-        if (input === '3483') {
+        if (input === '0000') {
             siren.stop();
             alert("You've entered the right code. The hack has been stopped");
             break;
